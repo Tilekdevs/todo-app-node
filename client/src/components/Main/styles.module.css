@@ -41,11 +41,14 @@
 
 .create_form input {
   width: 300px;
+  height: 15px;
   padding: 10px;
   border-bottom: 2px solid;
   outline: none;
+  border-radius: 10px 0 0 10px;
 }
 .create_form button {
+  height: 40px;
   padding: 10px;
   background-color: black;
   color: white;
@@ -106,4 +109,52 @@
 
 .trash_icon:hover {
   color: #c9302c;
+}
+
+.task_category {
+  font-size: 14px;
+  color: #888;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.task_date {
+  font-size: 14px;
+  color: ;
+}
+
+.filter_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.filter_dropdown {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.filter_dropdown:focus {
+  border-color: #3bb19b;
+  outline: none;
+}
+
+.filter_label {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.category_dropdown {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-left: 10px;
 }

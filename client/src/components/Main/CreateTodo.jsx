@@ -1,35 +1,39 @@
 import { useState } from 'react';
-import axios from 'axios';
-import styles from './styles.module.css';
+import style from './styles.module.css'
 
-function Create({ onTaskAdd }) {
+const CreateTodo = ({ onTaskAdd }) => {
   const [task, setTask] = useState('');
+  const [category, setCategory] = useState('Общие'); 
 
-  const handleAdd = () => {
-    if (task.trim() === '') return;
-
-    axios
-      .post('http://localhost:8080/add', { task })
-      .then(result => {
-        onTaskAdd(result.data); 
-        setTask('');
-      })
-      .catch(err => console.log(err));
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (task.trim()) {
+      onTaskAdd(task, category); 
+      setTask('');
+      setCategory('Общие'); 
+    }
   };
 
   return (
-    <div className={styles.create_form}>
+    <form onSubmit={handleSubmit} className={style.create_form}>
       <input
-        type='text'
-        placeholder='Enter task'
+        type="text"
         value={task}
         onChange={(e) => setTask(e.target.value)}
+        placeholder="Добавьте задачу"
       />
-      <button onClick={handleAdd} type='button'>
-        Добавить
-      </button>
-    </div>
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)} 
+      >
+        <option value="Общие">Общие</option>
+        <option value="Работа">Работа</option>
+        <option value="Личное">Личное</option>
+        <option value="Другое">Другое</option>
+      </select>
+      <button type="submit">Добавить</button>
+    </form>
   );
-}
+};
 
-export default Create;
+export default CreateTodo;

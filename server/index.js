@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const cors = require("cors");
 const connectionDB = require("./db");
 const userRoutes = require("./routes/users");
@@ -10,7 +10,7 @@ const todoModal = require("./models/todo");
 
 const connectionString = process.env.DB;
 
-mongoose.set('strictQuery', false); // это отключит предупреждение
+mongoose.set('strictQuery', false);
 
 mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
@@ -23,8 +23,6 @@ mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: 
 app.use(express.json());
 app.use(cors());
 
-app.use("/api/users", userRoutes);
-app.use("/api/auth", authRoutes);
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -34,28 +32,58 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
+
+
 app.get('/get', (req, res) => {
   todoModal
     .find()
     .then(result => res.json(result))
-    .catch(err => res.json(err));
+    .catch(err => res.status(500).json({ error: err.message }));
 });
 
 app.post('/add', (req, res) => {
-  const task = req.body.task;
+  const { task, category = 'Общие' } = req.body; 
   todoModal
-    .create({ task: task })
+    .create({ task, category, done: false, createdAt: new Date() })
     .then(result => res.json(result))
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
+
+app.post('/create', (req, res) => {
+  const { task, category } = req.body;
+
+  const newTask = new todoModal({ task, category, done: false, createdAt: new Date() });
+  newTask.save()
+    .then(savedTask => res.json(savedTask))
+    .catch(err => res.status(500).json({ error: 'Ошибка при создании задачи' }));
+});
+
 app.put('/update/:id', (req, res) => {
   const { id } = req.params;
+
   todoModal
-    .findByIdAndUpdate({ _id: id }, { done: true })
-    .then(result => res.json(result))
-    .catch(err => res.json(err));
+    .findById(id)
+    .then(todo => {
+      if (!todo) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+
+      return todoModal.findByIdAndUpdate(
+        id,
+        { done: !todo.done },
+        { new: true }
+      );
+    })
+    .then(updatedTodo => res.json(updatedTodo))
+    .catch(err => {
+      console.error('Error updating task:', err);
+      res.status(500).json({ error: 'Server error' });
+    });
 });
+
 
 app.delete('/delete/:id', (req, res) => {
   const { id } = req.params;
